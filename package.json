@@ -1,0 +1,26 @@
+{
+  "name": "security-policies-to-eslint-rules",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @repo/demo",
+    "lint": "eslint .",
+    "typecheck": "tsc -p . && npm run typecheck --workspaces --if-present",
+    "test": "vitest run --passWithNoTests"
+  },
+  "devDependencies": {
+    "@html-eslint/eslint-plugin": "0.66.1",
+    "@html-eslint/parser": "0.66.1",
+    "@types/node": "26.6.4",
+    "eslint": "10.12.0",
+    "jiti": "2.7.0",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.0",
+    "vitest": "5.0.3"
+  }
+}
