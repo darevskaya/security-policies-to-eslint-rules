@@ -8,7 +8,7 @@ const root = path.resolve(import.meta.dirname, "..");
 const viewsDir = path.join(import.meta.dirname, "views");
 const examplesDir = path.join(root, "examples");
 
-const EXAMPLE_ID = /^\d{2}-[a-z0-9-]+$/;
+const EXAMPLE_ID = /^[a-z0-9-]+$/;
 const VARIANTS = new Set(["bad", "good"]);
 
 export function createApp(): Express {

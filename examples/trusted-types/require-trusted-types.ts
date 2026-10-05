@@ -1,6 +1,7 @@
 import { ESLintUtils, type TSESTree } from "@typescript-eslint/utils";
+import type { Rule } from "eslint";
 
-export default ESLintUtils.RuleCreator.withoutDocs({
+const rule = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
     type: "problem",
     schema: [],
@@ -36,3 +37,5 @@ export default ESLintUtils.RuleCreator.withoutDocs({
     };
   },
 });
+
+export default rule as unknown as Rule.RuleModule;

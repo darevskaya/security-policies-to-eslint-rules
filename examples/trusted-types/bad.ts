@@ -1,5 +1,6 @@
-const comment = new URLSearchParams(location.search).get("comment") ?? "";
+const value = new URLSearchParams(location.search).get("comment") ?? "";
 const output = document.createElement("div");
 
-output.innerHTML = comment;
-output.insertAdjacentHTML("beforeend", comment);
+output.innerHTML = "<b>Hello</b>";
+
+output.innerHTML = value;

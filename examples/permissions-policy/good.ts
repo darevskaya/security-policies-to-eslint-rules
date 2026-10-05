@@ -1,3 +1,4 @@
-navigator.clipboard.writeText("Copied");
-
-document.documentElement.requestFullscreen();
+navigator.mediaDevices.getUserMedia({
+  video: false,
+  audio: true,
+});

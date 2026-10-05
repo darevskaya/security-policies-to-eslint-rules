@@ -10,6 +10,10 @@ export default defineConfig({
         tagPatterns: ["^object$", "^embed$"],
         message: "object-src 'none' blocks this element.",
       },
+      {
+        tagPatterns: ["^base$"],
+        message: "base-uri 'none' disallows a base URL.",
+      },
     ],
   },
 });

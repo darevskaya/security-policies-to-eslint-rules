@@ -1,15 +1,17 @@
 import { defineConfig } from "eslint/config";
 import { scripts, templates } from "../eslint.base.ts";
 
-const message = "script-src-attr 'none' blocks inline event handlers.";
-
 export default defineConfig(
   {
     ...templates,
     rules: {
       "@html-eslint/no-restricted-attrs": [
         "error",
-        { tagPatterns: [".*"], attrPatterns: ["^on"], message },
+        {
+          tagPatterns: [".*"],
+          attrPatterns: ["^on"],
+          message: "script-src-attr 'none' blocks inline event handlers.",
+        },
       ],
     },
   },
@@ -21,7 +23,8 @@ export default defineConfig(
         {
           selector:
             'CallExpression[callee.property.name="setAttribute"][arguments.0.value=/^on/i]',
-          message,
+          message:
+            "script-src-attr 'none' blocks inline event handlers. Use addEventListener instead",
         },
       ],
     },

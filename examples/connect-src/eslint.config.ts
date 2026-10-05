@@ -1,18 +1,28 @@
 import { defineConfig } from "eslint/config";
-import { policy } from "../../policy.ts";
-import { scripts, templates } from "../eslint.base.ts";
+import { scripts } from "../eslint.base.ts";
 
 export default defineConfig(
   {
-    ...templates,
+    ...scripts,
+    files: ["**/{bad,good,api}.ts"],
     rules: {
-      "browser-policy/html-csp-source-allowlist": ["error", policy.csp],
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "Literal[value=/^https?:/]",
+          message: "Do not hardcode external URLs. Use endpoints.ts instead.",
+        },
+      ],
     },
   },
   {
     ...scripts,
+    files: ["**/{bad,good,endpoints}.ts"],
     rules: {
-      "browser-policy/csp-source-allowlist": ["error", policy.csp],
+      "no-restricted-globals": [
+        "error",
+        { name: "fetch", message: "Call fetch() only in api.ts." },
+      ],
     },
   },
 );

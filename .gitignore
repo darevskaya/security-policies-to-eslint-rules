@@ -6,3 +6,5 @@ playwright-report/
 .eslintcache
 *.tsbuildinfo
 .env
+ARTICLE-ISSUES.md
+ARTICLE.md

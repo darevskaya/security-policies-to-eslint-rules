@@ -1,5 +1,3 @@
-fetch("/api/user");
+import { getOrders } from "./api.ts";
 
-fetch("https://api.example/orders");
-
-navigator.sendBeacon("/api/log", "page-view");
+getOrders();

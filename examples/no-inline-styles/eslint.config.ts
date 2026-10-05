@@ -20,7 +20,7 @@ export default defineConfig(
         },
         {
           selector: 'AssignmentExpression[left.property.name="cssText"]',
-          message: "style-src-attr 'none' blocks cssText.",
+          message: "style-src-attr 'none' blocks assigning cssText.",
         },
       ],
     },
