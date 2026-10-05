@@ -1,4 +1,15 @@
 {
-  "extends": "./tsconfig.base.json",
-  "include": ["*.ts", "tests/**/*.ts"]
+  "compilerOptions": {
+    "target": "es2024",
+    "lib": ["es2024"],
+    "module": "nodenext",
+    "types": ["node"],
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "exclude": ["node_modules", "examples/*/bad.ts", "examples/*/good.ts", "examples/globals.d.ts"]
 }

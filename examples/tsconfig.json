@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "lib": ["es2024", "dom"],
+    "types": ["trusted-types"],
+    "moduleDetection": "force"
+  },
+  "include": ["*/bad.ts", "*/good.ts", "globals.d.ts"],
+  "exclude": []
+}

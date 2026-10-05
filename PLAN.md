@@ -4,41 +4,25 @@
 
 The article shows that a browser security policy can become a lint rule. Examples of such policies are CSP and Permissions Policy. This repo is the proof for the article. Each example needs code that fails lint, code that passes lint, and a page that shows the real browser behavior.
 
-## Decision: one repo, one ESLint configuration, three workspaces
+## Structure
 
-Use one npm workspaces repo with one root `eslint.config.ts`. Do not make one subproject for each example.
-
-- One subproject for each example means 21 installs and 21 configurations. The reader loses the view of the full mapping.
-- Flat configuration scopes rules with `files` globs. One block for each example gives the same isolation.
-- The custom rules need their own package because they have their own tests. You can publish that package later.
-
-The key idea of the repo is one policy object with two consumers. The Express server turns the object into response headers. The ESLint configuration turns the object into rule options. The header and the lint rule cannot drift apart.
+The repo is one flat package. It has no workspaces.
 
 ```
-package.json                  npm workspaces, scripts
-eslint.config.ts              one block per example, reads the policy
-tsconfig.base.json
-packages/policy/              policy.ts, toHeaders(), toLintOptions()
-packages/eslint-plugin-browser-policy/
-  src/rules/*.ts              custom rules
-  src/util/source-list.ts     CSP source list matcher ('self', host, scheme, 'none')
-  tests/*.test.ts             RuleTester
-apps/demo/
-  src/server/                 Express 5, headers middleware, nonce per response
-  src/client/                 browser TypeScript (DOM lib)
-  views/                      Handlebars layouts
-  examples/NN-name/           bad.hbs, good.hbs, bad.ts, good.ts, README.md
-tests/lint-examples.test.ts   ESLint API over every example
-tests/browser/*.spec.ts       Playwright, real browser behavior
+examples/NN-name/     bad.hbs, good.hbs, bad.ts, good.ts, eslint.config.ts
+examples/eslint.base.ts   parser setup that all example configurations share
+policy.ts             policy object and toHeaders()
+plugin/               custom rules and their helpers
+server/               Express 5, headers middleware, Handlebars views
+eslint.config.ts      configuration for the repo code
+tests/lint-examples.test.ts
 ```
 
-## Stack
+Each example folder has its own `eslint.config.ts`, so a reader sees the code and its rules together. ESLint 10 uses the configuration file that is nearest to the linted file.
 
-- TypeScript, Express 5, and `express-handlebars`. Handlebars has a preset in `@html-eslint/parser` (`TEMPLATE_ENGINE_SYNTAX.HANDLEBAR`). EJS has no preset. The `{{cspNonce}}` placeholder also matches example 18.
-- ESLint flat configuration, `typescript-eslint`, `@html-eslint/eslint-plugin` (0.66.x), and `eslint-plugin-no-unsanitized`.
-- Vitest for rule tests. Playwright for browser tests.
-- At install time, make sure that the peer ranges of all plugins accept the chosen ESLint major version (9 or 10). Pin exact versions.
-- The `bad.*` files fail lint on purpose. Exclude them from `npm run lint`. Assert their errors in `tests/lint-examples.test.ts`.
+`policy.ts` is one object with two readers. The server turns it into response headers. The example configurations give it to the rules as options.
+
+The stack is TypeScript 6, Express 5, `express-handlebars`, ESLint 10, `typescript-eslint`, `@html-eslint`, and Vitest. Browser tests with Playwright are postponed.
 
 ## Verdict for each example
 
@@ -98,47 +82,29 @@ The draft also shows a rule that permits `fetch` only through `apiClient`. Show 
 
 ## Custom rules
 
-The package name is `eslint-plugin-browser-policy`.
+The custom rules are in `plugin/rules`. They report literal values only.
 
-JavaScript rules use `@typescript-eslint/utils` and `RuleTester`:
-
-- `no-inline-handler-attribute` (example 2)
-- `no-inline-style-string` (example 3)
-- `require-trusted-types`, typed (example 4)
+- `csp-source-allowlist` and `html-csp-source-allowlist` (examples 8 to 11)
+- `require-trusted-types`, with type information (example 4)
 - `trusted-types-policy-names` (example 5)
-- `csp-source-allowlist`, with options for connect, worker, and form sinks (examples 9, 10, 11)
 - `no-disabled-permission-api` (example 13)
-- `no-weak-referrer-policy` (example 16)
-- `no-insecure-url` (example 21)
-- `window-open-noopener` (example 20, appendix)
-
-HTML rules visit `@html-eslint/parser` nodes (`Tag`, `Attribute`):
-
-- `html-csp-source-allowlist` (examples 7, 8, 9, 10)
-- `iframe-sandbox-tokens` (example 12)
 - `iframe-allow-policy` (example 14)
-- `require-integrity` (example 17)
-- `no-static-nonce` (example 18)
 - `coep-cross-origin` (example 19)
 
-All URL rules share `src/util/source-list.ts`. They report literal URLs only. For a dynamic value, a rule option selects between ignore and report.
+All other examples use core ESLint rules or `@html-eslint` rules.
 
-## Build order
+## Status
 
-1. Scaffold the repo: git, workspaces, TypeScript, ESLint, Vitest.
-2. Write `packages/policy` and the Express app. The app has the headers middleware and one route for each example (`/examples/:id/:variant`).
-3. Write the examples that need only existing rules: 1, 6, 7 (`'none'`), 15, 16 (HTML), 21 (HTML), and the HTML sides of 2, 3, and 12.
-4. Write the source list matcher, then examples 7 to 11.
-5. Write the other custom rules: 2, 3, 4, 5, 12, 13, 14, 16, 17, 18, 19, 21.
-6. Write the Playwright tests. Each `bad` page must produce a `securitypolicyviolation` event, a `TypeError`, or a rejected promise. Each `good` page must produce none.
-7. Write the root `README.md` with one table: policy, browser behavior, rule, example folder. The article uses the same table.
+- Done: examples 1 to 19 and 21, each with its own `eslint.config.ts`.
+- Done: Express server that sends the policy headers.
+- Postponed: Playwright browser tests. They also settle note A.
+- Open: example 20, see note D.
 
 ## How to test the result
 
 - `npm run lint` passes on all `good` files and on the repo code.
-- `npm test` runs the `RuleTester` suites and `tests/lint-examples.test.ts`. That test asserts the exact rule ids on every `bad` file and zero messages on every `good` file.
-- `npm run test:browser` runs Playwright against the Express server. It proves that the browser blocks what the lint rule reports. It also settles note A.
-- Manual test: start the server, open `/examples/04/bad`, and read the violation in the browser console.
+- `npm test` makes sure that every `bad` file reports a problem and every `good` file reports none.
+- `npm run typecheck` passes.
 
 ## Sources
 
